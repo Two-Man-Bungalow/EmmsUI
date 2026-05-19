@@ -16,6 +16,7 @@
 #include "Widgets/Layout/SBox.h"
 
 #include "AngelscriptBinds.h"
+#include "AngelscriptDocs.h"
 
 FEmmsAttributeSpecification* UEmmsEditorWidgetHelpers::Attr_UMMObjectPropertyEntryBox_AllowedClass = nullptr;
 FEmmsAttributeSpecification* UEmmsEditorWidgetHelpers::Attr_UMMObjectPropertyEntryBox_Object = nullptr;
@@ -235,7 +236,7 @@ FEmmsWidgetHandle UEmmsEditorWidgetHelpers::EditablePropertyValue(UObject* Objec
 bool UEmmsEditorWidgetHelpers::DiffersFromDefault(FEmmsWidgetHandle* Widget)
 {
 	UMMSinglePropertyValue* ValueWidget = Cast<UMMSinglePropertyValue>(Widget->Element->UMGWidget);
-	if (ValueWidget->SinglePropertyViewWidget.IsValid())
+	if (ValueWidget != nullptr && ValueWidget->SinglePropertyViewWidget.IsValid())
 	{
 		if (const TSharedPtr<IPropertyHandle> Handle = ValueWidget->SinglePropertyViewWidget->GetPropertyHandle())
 			return Handle->DiffersFromDefault();
@@ -283,27 +284,45 @@ AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsEditorWidgetHelpers((int32
 
 	{
 		auto mmUPropertyViewBase_ = FAngelscriptBinds::ExistingClass("mm<UPropertyViewBase>");
+
 		mmUPropertyViewBase_.Method("void SetObject(UObject Object) const", &UEmmsEditorWidgetHelpers::SetDetailsViewObject);
-		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
-		mmUPropertyViewBase_.Method("void SetStruct(?& StructRef) const", &UEmmsEditorWidgetHelpers::SetDetailsViewStruct_NoTitle);
-		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
-		mmUPropertyViewBase_.Method("void SetStruct(?& StructRef, const FString& HeaderTitle) const", &UEmmsEditorWidgetHelpers::SetDetailsViewStruct);
+		SCRIPT_BIND_DOCUMENTATION("Display the given object's properties in the details view");
 		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
 
-		mmUPropertyViewBase_.Method("bool DiffersFromDefault() const", &UEmmsEditorWidgetHelpers::DiffersFromDefault);
+		mmUPropertyViewBase_.Method("void SetStruct(?& StructRef) const", &UEmmsEditorWidgetHelpers::SetDetailsViewStruct_NoTitle);
+		SCRIPT_BIND_DOCUMENTATION("Display a struct's properties in the details view, the passed in struct reference will be modified with the values from the UI");
+		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
+
+		mmUPropertyViewBase_.Method("void SetStruct(?& StructRef, const FString& HeaderTitle) const", &UEmmsEditorWidgetHelpers::SetDetailsViewStruct);
+		SCRIPT_BIND_DOCUMENTATION("Display a struct's properties in the details view, the passed in struct reference will be modified with the values from the UI");
+		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
+	}
+
+	{
+		auto mmUMMSinglePropertyValue_ = FAngelscriptBinds::ExistingClass("mm<UPropertyViewBase>");
+
+		mmUMMSinglePropertyValue_.Method("bool DiffersFromDefault() const", &UEmmsEditorWidgetHelpers::DiffersFromDefault);
+		SCRIPT_BIND_DOCUMENTATION("Whether the value of the displayed property currently differs from its default");
 		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
 	}
 
 	{
 		FAngelscriptBinds::FNamespace ns("mm");
+
 		FAngelscriptBinds::BindGlobalFunction("mm<UAssetThumbnailWidget> AssetThumbnail(UObject Object, int32 Resolution = 64)", &UEmmsEditorWidgetHelpers::AssetThumbnailFromObject);
+		SCRIPT_BIND_DOCUMENTATION("Show an asset thumbnail for the specified asset");
 		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
+
 		FAngelscriptBinds::BindGlobalFunction("mm<UAssetThumbnailWidget> AssetThumbnail(const FAssetData& AssetData, int32 Resolution = 64)", &UEmmsEditorWidgetHelpers::AssetThumbnailFromAssetData);
+		SCRIPT_BIND_DOCUMENTATION("Show an asset thumbnail for the specified asset");
 		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
+
 		FAngelscriptBinds::BindGlobalFunction("mm<UMMSinglePropertyValue> EditablePropertyValue(UObject Object, const FName& PropertyName, bool bShowResetToDefault = false)", &UEmmsEditorWidgetHelpers::EditablePropertyValue);
+		SCRIPT_BIND_DOCUMENTATION("Show an editable value widget for a single property in an object");
 		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
 
 		FAngelscriptBinds::BindGlobalFunction("mm<UMMObjectPropertyEntryBox> ObjectPropertyEntry(?& Object)", &UEmmsEditorWidgetHelpers::ObjectPropertyEntry);
+		SCRIPT_BIND_DOCUMENTATION("Show an asset picker widget where an asset can be chosen through a the standard dropdown. The passed in object reference will be set to the selected asset.");
 		FAngelscriptBinds::SetPreviousBindIsEditorOnly(true);
 
 		UEmmsEditorWidgetHelpers::Attr_UMMObjectPropertyEntryBox_AllowedClass = UEmmsWidgetHelpers::GetWidgetAttrSpec("AllowedClass", UMMObjectPropertyEntryBox::StaticClass());
