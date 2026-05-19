@@ -71,6 +71,7 @@ public:
 	static FEmmsWidgetHandle WithinPanelWidget(class asCScriptFunction* ScriptFunction);
 
 	static FEmmsWidgetHandle AddWidget(const TSubclassOf<UWidget>& WidgetType);
+	static void SetPendingTooltipText(const FString& Text);
 
 	static UEmmsEventListener* GetOrCreateEventListener(FEmmsWidgetHandle* Handle, FProperty* Property);
 	static bool WasEventTriggered(FEmmsWidgetHandle* Handle, class asCScriptFunction* ScriptFunction);

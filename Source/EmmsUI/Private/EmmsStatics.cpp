@@ -458,6 +458,17 @@ FEmmsWidgetHandle UEmmsStatics::AddWidget(const TSubclassOf<UWidget>& WidgetType
 	);
 }
 
+void UEmmsStatics::SetPendingTooltipText(const FString& Text)
+{
+	if (ImplicitHierarchy.Num() == 0)
+	{
+		FAngelscriptManager::Throw("No immediate root is active to assign to");
+		return;
+	}
+
+	ImplicitHierarchy.Last().Root->PendingTooltip = Text;
+}
+
 FEmmsWidgetHandle UEmmsStatics::BeginPanelWidget(class asCScriptFunction* ScriptFunction)
 {
 	return BeginWidget(

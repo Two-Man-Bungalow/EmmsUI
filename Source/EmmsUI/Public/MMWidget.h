@@ -21,6 +21,7 @@ public:
 	TMap<FEmmsWidgetIdentifier, TArray<FEmmsWidgetElement*, TInlineAllocator<8>>> AvailableWidgets;
 	TMap<FEmmsWidgetIdentifier, TArray<FEmmsWidgetElement*, TInlineAllocator<8>>> PendingWidgets;
 	TMap<FEmmsAttributeSpecification*, FEmmsAttributeValue> PendingSlotAttributes;
+	TOptional<FString> PendingTooltip;
 
 	FEmmsWidgetElement* ActiveRootWidget = nullptr;
 	FEmmsWidgetElement* PendingRootWidget = nullptr;

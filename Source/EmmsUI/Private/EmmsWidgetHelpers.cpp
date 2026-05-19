@@ -1401,6 +1401,9 @@ AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsWidgetHelpers((int32)FAnge
 		SCRIPT_BIND_DOCUMENTATION("Add an editable checkbox. The out boolean will be modified depending on whether the user checks the box");
 		FAngelscriptBinds::BindGlobalFunction("mm<UCheckBox> CheckBox(bool&out OutValue, const FString& Label)", &UEmmsWidgetHelpers::CheckBox_Label);
 		SCRIPT_BIND_DOCUMENTATION("Add an editable checkbox with the specified label text. The out boolean will be modified depending on whether the user checks the box");
+
+		FAngelscriptBinds::BindGlobalFunction("void Tooltip(const FString& TooltipText)", &UEmmsStatics::SetPendingTooltipText);
+		SCRIPT_BIND_DOCUMENTATION("Set a tooltip for the next immediate widget that is added after this");
 	}
 
 	{

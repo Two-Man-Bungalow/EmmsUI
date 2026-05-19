@@ -7,6 +7,7 @@
 #include "EmmsStatics.h"
 #include "EmmsSlotHelpers.h"
 #include "EmmsDefaultWidgetStyles.h"
+#include "EmmsWidgetHelpers.h"
 #include "Blueprint/WidgetTree.h"
 
 UMMWidget::UMMWidget(const FObjectInitializer& ObjectInitializer)
@@ -87,7 +88,7 @@ void UMMWidget::CallDraw(float InDeltaTime)
 	if (!bAllowDraw)
 		return;
 
-	if (GetClass()->bIsScriptClass || ExternalDrawFunction)
+	if (GetClass()->bIsScriptClass || GetClass()->HasAllClassFlags(CLASS_CompiledFromBlueprint) || ExternalDrawFunction)
 	{
 		UEmmsStatics::BeginDraw(this, DefaultRootPanel);
 
@@ -248,6 +249,13 @@ FEmmsWidgetHandle UMMWidget::GetOrCreateChildWidget(
 		{
 			ResetPendingSlotAttributes();
 		}
+	}
+
+	if (PendingTooltip.IsSet())
+	{
+		FEmmsWidgetHandle WidgetHandle{this, WidgetElement};
+		UEmmsWidgetHelpers::SetToolTipText(&WidgetHandle, PendingTooltip.GetValue());
+		PendingTooltip.Reset();
 	}
 
 	PendingWidgets.FindOrAdd(Identifier).Add(WidgetElement);
