@@ -165,6 +165,15 @@ TSharedPtr<SWidget> UMMContextMenuStatics::GenerateContextMenu(const FMMContextM
 				if (Item.Parent != ParentIndex)
 					continue;
 
+				FSlateIcon Icon;
+				if (!Item.Option.Icon.IsNone())
+				{
+					if (!Item.Option.IconStyleSet.IsNone())
+						Icon = FSlateIcon(Item.Option.IconStyleSet, Item.Option.Icon);
+					else
+						Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), Item.Option.Icon);
+				}
+
 				if (Item.Type == FMMContextMenu::EContextItemType::Section)
 				{
 					Builder.BeginSection(*Item.Option.Label, FText::FromString(Item.Option.Label));
@@ -173,10 +182,6 @@ TSharedPtr<SWidget> UMMContextMenuStatics::GenerateContextMenu(const FMMContextM
 				}
 				else if (Item.Type == FMMContextMenu::EContextItemType::SubMenu)
 				{
-					FSlateIcon Icon;
-					if (!Item.Option.Icon.IsNone())
-						Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), Item.Option.Icon);
-
 					Builder.AddSubMenu(
 						FText::FromString(Item.Option.Label),
 						FText::FromString(Item.Option.Tooltip),
@@ -193,10 +198,6 @@ TSharedPtr<SWidget> UMMContextMenuStatics::GenerateContextMenu(const FMMContextM
 				}
 				else if (Item.Type == FMMContextMenu::EContextItemType::Option && Item.Option.Type == EMMContextMenuOptionType::Option)
 				{
-					FSlateIcon Icon;
-					if (!Item.Option.Icon.IsNone())
-						Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), Item.Option.Icon);
-
 					FUIAction UIAction(
 						FExecuteAction::CreateLambda([Option=Item.Option]()
 						{
@@ -218,10 +219,6 @@ TSharedPtr<SWidget> UMMContextMenuStatics::GenerateContextMenu(const FMMContextM
 				}
 				else if (Item.Type == FMMContextMenu::EContextItemType::Option && Item.Option.Type == EMMContextMenuOptionType::Checkbox)
 				{
-					FSlateIcon Icon;
-					if (!Item.Option.Icon.IsNone())
-						Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), Item.Option.Icon);
-
 					FUIAction UIAction(
 						FExecuteAction::CreateLambda([Option=Item.Option]()
 						{

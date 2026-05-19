@@ -28,6 +28,9 @@ struct EMMSUIEDITOR_API FMMContextMenuOption
 	FString Tooltip;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Context Menu")
+	FName IconStyleSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Context Menu")
 	FName Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Context Menu")
