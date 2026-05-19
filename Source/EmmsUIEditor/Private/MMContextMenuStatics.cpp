@@ -3,6 +3,7 @@
 #include "Framework/Application/MenuStack.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Modules/ModuleManager.h"
+#include "AngelscriptManager.h"
 #include "EmmsWidgetElement.h"
 #include "SClassViewer.h"
 #include "ClassViewerFilter.h"
@@ -309,6 +310,9 @@ TSharedPtr<SWidget> UMMContextMenuStatics::GenerateContextMenu(const FMMContextM
 
 AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_MMContextMenu((int32)FAngelscriptBinds::EOrder::Late + 250, []
 {
+	if (!FAngelscriptManager::bUseEditorScripts)
+		return;
+
 	{
 		FAngelscriptBinds::FNamespace ns("mm");
 		FAngelscriptBinds::BindGlobalFunction("void ShowContextMenu(const FMMContextMenu& Menu, const mm<UWidget>& Anchor)", &UMMContextMenuStatics::ShowContextMenuFromWidget);
