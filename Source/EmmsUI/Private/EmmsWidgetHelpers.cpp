@@ -400,11 +400,40 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::EditableTextBox(FString& OutTextValue)
 
 	auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_UEditableTextBox_Text);
 
-	FText NewValue = FText::FromString(OutTextValue);
-	if (!AttributeState.CurrentValue.IsEmpty() && ((FText*)AttributeState.CurrentValue.GetDataPtr())->EqualTo(NewValue))
-		OutTextValue = CastChecked<UEditableTextBox>(Widget.Element->UMGWidget)->GetText().ToString();
-	AttributeState.SetPendingValue(Attr_UEditableTextBox_Text, &NewValue);
-	
+	FText CurrentInputValue = CastChecked<UEditableTextBox>(Widget.Element->UMGWidget)->GetText();
+	FText PreviousInputValue;
+	if (!AttributeState.MirroredValue.IsEmpty())
+	{
+		PreviousInputValue = *(FText*)AttributeState.MirroredValue.GetDataPtr();
+	}
+	else
+	{
+		PreviousInputValue = CurrentInputValue;
+		Attr_UEditableTextBox_Text->InitializeValue(AttributeState.MirroredValue);
+	}
+
+	FText PreviousAttributeValue;
+	if (!AttributeState.CurrentValue.IsEmpty())
+		PreviousAttributeValue = *(FText*)AttributeState.CurrentValue.GetDataPtr();
+	else
+		PreviousAttributeValue = CurrentInputValue;
+
+	FText NewAttributeValue = FText::FromString(OutTextValue);
+
+	*(FText*)AttributeState.MirroredValue.GetDataPtr() = CurrentInputValue;
+
+	if (!CurrentInputValue.EqualTo(PreviousInputValue))
+	{
+		OutTextValue = CurrentInputValue.ToString();
+		AttributeState.SetPendingValue(Attr_UEditableTextBox_Text, &PreviousAttributeValue);
+	}
+	else
+	{
+		if (PreviousAttributeValue.EqualTo(NewAttributeValue))
+			OutTextValue = CurrentInputValue.ToString();
+		AttributeState.SetPendingValue(Attr_UEditableTextBox_Text, &NewAttributeValue);
+	}
+
 	return Widget;
 }
 
@@ -416,10 +445,39 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::EditableText(FString& OutTextValue, const 
 
 	auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_UEditableText_Text);
 
-	FText NewValue = FText::FromString(OutTextValue);
-	if (!AttributeState.CurrentValue.IsEmpty() && ((FText*)AttributeState.CurrentValue.GetDataPtr())->EqualTo(NewValue))
-		OutTextValue = CastChecked<UEditableText>(Widget.Element->UMGWidget)->GetText().ToString();
-	AttributeState.SetPendingValue(Attr_UEditableText_Text, &NewValue);
+	FText CurrentInputValue = CastChecked<UEditableText>(Widget.Element->UMGWidget)->GetText();
+	FText PreviousInputValue;
+	if (!AttributeState.MirroredValue.IsEmpty())
+	{
+		PreviousInputValue = *(FText*)AttributeState.MirroredValue.GetDataPtr();
+	}
+	else
+	{
+		PreviousInputValue = CurrentInputValue;
+		Attr_UEditableText_Text->InitializeValue(AttributeState.MirroredValue);
+	}
+
+	FText PreviousAttributeValue;
+	if (!AttributeState.CurrentValue.IsEmpty())
+		PreviousAttributeValue = *(FText*)AttributeState.CurrentValue.GetDataPtr();
+	else
+		PreviousAttributeValue = CurrentInputValue;
+
+	FText NewAttributeValue = FText::FromString(OutTextValue);
+
+	*(FText*)AttributeState.MirroredValue.GetDataPtr() = CurrentInputValue;
+
+	if (!CurrentInputValue.EqualTo(PreviousInputValue))
+	{
+		OutTextValue = CurrentInputValue.ToString();
+		AttributeState.SetPendingValue(Attr_UEditableText_Text, &PreviousAttributeValue);
+	}
+	else
+	{
+		if (PreviousAttributeValue.EqualTo(NewAttributeValue))
+			OutTextValue = CurrentInputValue.ToString();
+		AttributeState.SetPendingValue(Attr_UEditableText_Text, &NewAttributeValue);
+	}
 
 	if (FText* Value = GetPartialPendingAttribute<FText>(Widget, Attr_UEditableText_HintText))
 	{
@@ -443,7 +501,6 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::EditableText(FString& OutTextValue, const 
 		}
 	}
 
-
 	return Widget;
 }
 
@@ -453,12 +510,40 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::SpinBox(double& OutValue)
 	if (Widget.Element == nullptr)
 		return Widget;
 
+	auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_USpinBox_Value);
+
+	float CurrentInputValue = CastChecked<USpinBox>(Widget.Element->UMGWidget)->GetValue();
+	float PreviousInputValue;
+	if (!AttributeState.MirroredValue.IsEmpty())
 	{
-		float NewValue = (float)OutValue;
-		auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_USpinBox_Value);
-		if (!AttributeState.CurrentValue.IsEmpty() && *(float*)AttributeState.CurrentValue.GetDataPtr() == NewValue)
-			OutValue = (double)CastChecked<USpinBox>(Widget.Element->UMGWidget)->GetValue();
-		AttributeState.SetPendingValue(Attr_USpinBox_Value, &NewValue);
+		PreviousInputValue = *(float*)AttributeState.MirroredValue.GetDataPtr();
+	}
+	else
+	{
+		PreviousInputValue = CurrentInputValue;
+		Attr_USpinBox_Value->InitializeValue(AttributeState.MirroredValue);
+	}
+
+	float PreviousAttributeValue;
+	if (!AttributeState.CurrentValue.IsEmpty())
+		PreviousAttributeValue = *(float*)AttributeState.CurrentValue.GetDataPtr();
+	else
+		PreviousAttributeValue = CurrentInputValue;
+
+	float NewAttributeValue = (float)OutValue;
+
+	*(float*)AttributeState.MirroredValue.GetDataPtr() = CurrentInputValue;
+
+	if (CurrentInputValue != PreviousInputValue)
+	{
+		OutValue = (double)CurrentInputValue;
+		AttributeState.SetPendingValue(Attr_USpinBox_Value, &PreviousAttributeValue);
+	}
+	else
+	{
+		if (PreviousAttributeValue == NewAttributeValue)
+			OutValue = (double)CurrentInputValue;
+		AttributeState.SetPendingValue(Attr_USpinBox_Value, &NewAttributeValue);
 	}
 
 	// Sort the value attribute last in the list, so it doesn't get clamped by old Min/Max values
@@ -498,11 +583,41 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::SpinBox_Constrained(double& OutValue, floa
 	}
 
 	{
-		float NewValue = (float)OutValue;
 		auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_USpinBox_Value);
-		if (!AttributeState.CurrentValue.IsEmpty() && *(float*)AttributeState.CurrentValue.GetDataPtr() == NewValue)
-			OutValue = (double)CastChecked<USpinBox>(Widget.Element->UMGWidget)->GetValue();
-		AttributeState.SetPendingValue(Attr_USpinBox_Value, &NewValue);
+
+		float CurrentInputValue = CastChecked<USpinBox>(Widget.Element->UMGWidget)->GetValue();
+		float PreviousInputValue;
+		if (!AttributeState.MirroredValue.IsEmpty())
+		{
+			PreviousInputValue = *(float*)AttributeState.MirroredValue.GetDataPtr();
+		}
+		else
+		{
+			PreviousInputValue = CurrentInputValue;
+			Attr_USpinBox_Value->InitializeValue(AttributeState.MirroredValue);
+		}
+
+		float PreviousAttributeValue;
+		if (!AttributeState.CurrentValue.IsEmpty())
+			PreviousAttributeValue = *(float*)AttributeState.CurrentValue.GetDataPtr();
+		else
+			PreviousAttributeValue = CurrentInputValue;
+
+		float NewAttributeValue = (float)OutValue;
+
+		*(float*)AttributeState.MirroredValue.GetDataPtr() = CurrentInputValue;
+
+		if (CurrentInputValue != PreviousInputValue)
+		{
+			OutValue = (double)CurrentInputValue;
+			AttributeState.SetPendingValue(Attr_USpinBox_Value, &PreviousAttributeValue);
+		}
+		else
+		{
+			if (PreviousAttributeValue == NewAttributeValue)
+				OutValue = (double)CurrentInputValue;
+			AttributeState.SetPendingValue(Attr_USpinBox_Value, &NewAttributeValue);
+		}
 	}
 
 	// Sort the value attribute last in the list, so it doesn't get clamped by old Min/Max values
@@ -526,11 +641,41 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::Slider(double& OutValue, float MinValue, f
 		return Widget;
 
 	{
-		float NewValue = (float)OutValue;
 		auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_USlider_Value);
-		if (!AttributeState.CurrentValue.IsEmpty() && *(float*)AttributeState.CurrentValue.GetDataPtr() == NewValue)
-			OutValue = (double)CastChecked<USlider>(Widget.Element->UMGWidget)->GetValue();
-		AttributeState.SetPendingValue(Attr_USlider_Value, &NewValue);
+
+		float CurrentInputValue = CastChecked<USlider>(Widget.Element->UMGWidget)->GetValue();
+		float PreviousInputValue;
+		if (!AttributeState.MirroredValue.IsEmpty())
+		{
+			PreviousInputValue = *(float*)AttributeState.MirroredValue.GetDataPtr();
+		}
+		else
+		{
+			PreviousInputValue = CurrentInputValue;
+			Attr_USlider_Value->InitializeValue(AttributeState.MirroredValue);
+		}
+
+		float PreviousAttributeValue;
+		if (!AttributeState.CurrentValue.IsEmpty())
+			PreviousAttributeValue = *(float*)AttributeState.CurrentValue.GetDataPtr();
+		else
+			PreviousAttributeValue = CurrentInputValue;
+
+		float NewAttributeValue = (float)OutValue;
+
+		*(float*)AttributeState.MirroredValue.GetDataPtr() = CurrentInputValue;
+
+		if (CurrentInputValue != PreviousInputValue)
+		{
+			OutValue = (double)CurrentInputValue;
+			AttributeState.SetPendingValue(Attr_USlider_Value, &PreviousAttributeValue);
+		}
+		else
+		{
+			if (PreviousAttributeValue == NewAttributeValue)
+				OutValue = (double)CurrentInputValue;
+			AttributeState.SetPendingValue(Attr_USlider_Value, &NewAttributeValue);
+		}
 	}
 
 	if (float* Value = GetPartialPendingAttribute<float>(Widget, Attr_USlider_MinValue))
@@ -549,11 +694,41 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::CheckBox(bool& OutValue)
 		return Widget;
 
 	{
-		ECheckBoxState NewValue = OutValue ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 		auto& AttributeState = Widget.Element->Attributes.FindOrAdd(Attr_UCheckBox_CheckedState);
-		if (!AttributeState.CurrentValue.IsEmpty() && *(ECheckBoxState*)AttributeState.CurrentValue.GetDataPtr() == NewValue)
-			OutValue = CastChecked<UCheckBox>(Widget.Element->UMGWidget)->GetCheckedState() == ECheckBoxState::Checked;
-		AttributeState.SetPendingValue(Attr_UCheckBox_CheckedState, &NewValue);
+
+		ECheckBoxState CurrentInputValue = CastChecked<UCheckBox>(Widget.Element->UMGWidget)->GetCheckedState();
+		ECheckBoxState PreviousInputValue;
+		if (!AttributeState.MirroredValue.IsEmpty())
+		{
+			PreviousInputValue = *(ECheckBoxState*)AttributeState.MirroredValue.GetDataPtr();
+		}
+		else
+		{
+			PreviousInputValue = CurrentInputValue;
+			Attr_UCheckBox_CheckedState->InitializeValue(AttributeState.MirroredValue);
+		}
+
+		ECheckBoxState PreviousAttributeValue;
+		if (!AttributeState.CurrentValue.IsEmpty())
+			PreviousAttributeValue = *(ECheckBoxState*)AttributeState.CurrentValue.GetDataPtr();
+		else
+			PreviousAttributeValue = CurrentInputValue;
+
+		ECheckBoxState NewAttributeValue = OutValue ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+
+		*(ECheckBoxState*)AttributeState.MirroredValue.GetDataPtr() = CurrentInputValue;
+
+		if (CurrentInputValue != PreviousInputValue)
+		{
+			OutValue = (CurrentInputValue == ECheckBoxState::Checked);
+			AttributeState.SetPendingValue(Attr_UCheckBox_CheckedState, &PreviousAttributeValue);
+		}
+		else
+		{
+			if (PreviousAttributeValue == NewAttributeValue)
+				OutValue = (CurrentInputValue == ECheckBoxState::Checked);
+			AttributeState.SetPendingValue(Attr_UCheckBox_CheckedState, &NewAttributeValue);
+		}
 	}
 
 	return Widget;
@@ -866,6 +1041,8 @@ static bool WasBorderMouseButtonDown(FEmmsWidgetHandle* Widget, FDelegatePropert
 	if (!bTriggered)
 		return false;
 	if (EventListener->TriggeredParameters == nullptr)
+		return false;
+	if (!EventListener->bTriggeredParametersInitialized)
 		return false;
 
 	struct FParams
