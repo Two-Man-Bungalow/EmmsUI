@@ -82,11 +82,35 @@ void FEmmsUIEditorModule::UpdatePostCompile()
 					}
 					else
 					{
-						Group = ToolsRootGroup->AddGroup(
-							FName(CDO->Category),
-							FText::FromString(CDO->Category),
-							FText()
-						);
+						TArray<FString> CategoryPath;
+						CDO->Category.ParseIntoArray(CategoryPath, TEXT("|"));
+
+						for (int i = 0; i < CategoryPath.Num(); ++i)
+						{
+							FString PathElement = CategoryPath[i].TrimStartAndEnd();
+							FName CategoryElementName = *PathElement;
+
+							bool bFoundChild = false;
+
+							for (auto Item : Group->GetChildItems())
+							{
+								if (Item->GetFName() == CategoryElementName)
+								{
+									bFoundChild = true;
+									Group = Item;
+								}
+							}
+
+							if (!bFoundChild)
+							{
+								Group = Group->AddGroup(
+									CategoryElementName,
+									FText::FromString(FName::NameToDisplayString(PathElement, false)),
+									FText()
+								);
+							}
+						}
+
 						ToolsMenuCategories.Add(CDO->Category, Group);
 					}
 				}
