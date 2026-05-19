@@ -24,6 +24,23 @@ bool UMMListViewEntryWidget::AS_IsListItemSelected() const
 	return IsListItemSelected();
 }
 
+void UMMListViewEntryWidget::AS_SelectListItem()
+{
+	if (UTreeView* TreeView = Cast<UTreeView>(GetOwningListView()))
+		TreeView->SetSelectedItem(ListItem);
+}
+
+void UMMListViewEntryWidget::AS_SetListItemSelected(bool bSelected)
+{
+	if (UTreeView* TreeView = Cast<UTreeView>(GetOwningListView()))
+	{
+		if (bSelected && TreeView->GetSelectionMode() != ESelectionMode::Multi)
+			TreeView->SetSelectedItem(ListItem);
+		else
+			TreeView->SetItemSelection(ListItem, bSelected);
+	}
+}
+
 bool UMMListViewEntryWidget::AS_IsListItemExpanded() const
 {
 	return IsListItemExpanded();

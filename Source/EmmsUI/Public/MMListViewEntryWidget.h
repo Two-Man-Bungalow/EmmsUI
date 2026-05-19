@@ -31,6 +31,12 @@ public:
 	UFUNCTION(ScriptCallable, meta = (ScriptName = "IsListItemSelected"))
 	bool AS_IsListItemSelected() const;
 
+	UFUNCTION(ScriptCallable, meta = (ScriptName = "SelectListItem"))
+	void AS_SelectListItem();
+
+	UFUNCTION(ScriptCallable, meta = (ScriptName = "SetListItemSelected"))
+	void AS_SetListItemSelected(bool bSelected);
+
 	UFUNCTION(ScriptCallable, meta = (ScriptName = "IsListItemExpanded"))
 	bool AS_IsListItemExpanded() const;
 
