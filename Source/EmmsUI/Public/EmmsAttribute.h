@@ -40,6 +40,7 @@ struct EMMSUI_API FEmmsAttributeSpecification
 	bool bHasObjectReferences = false;
 
 	TFunction<void(FEmmsAttributeSpecification* Spec, void* Container, void* Value)> AssignValueFunction;
+	TFunction<bool(FEmmsAttributeSpecification* Spec, void* Container, void* PrevValue, void* NewValue)> CompareValueFunction;
 	TFunction<void(FEmmsAttributeSpecification* Spec, void* Container)> ResetToDefaultFunction;
 
 	FName GetAttributeName() const;

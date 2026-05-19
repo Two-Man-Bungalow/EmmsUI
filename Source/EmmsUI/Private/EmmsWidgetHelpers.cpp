@@ -16,7 +16,9 @@
 #include "Components/CheckBox.h"
 #include "Components/ComboBoxString.h"
 #include "Components/HorizontalBox.h"
+#include "Components/VerticalBox.h"
 #include "Components/Image.h"
+#include "Components/ScrollBox.h"
 #include "Components/EditableTextBox.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "Brushes/SlateColorBrush.h"
@@ -69,6 +71,7 @@ FEmmsAttributeSpecification* UEmmsWidgetHelpers::Attr_USlider_Value;
 FEmmsAttributeSpecification* UEmmsWidgetHelpers::Attr_USlider_MinValue;
 FEmmsAttributeSpecification* UEmmsWidgetHelpers::Attr_USlider_MaxValue;
 FEmmsAttributeSpecification* UEmmsWidgetHelpers::Attr_UCheckBox_CheckedState;
+FEmmsAttributeSpecification* UEmmsWidgetHelpers::Attr_UScrollBox_Orientation;
 
 FEmmsAttributeSpecification* UEmmsWidgetHelpers::GetWidgetAttrSpec(FName Name, UClass* Class)
 {
@@ -98,6 +101,13 @@ FEmmsWidgetHandle UEmmsWidgetHelpers::Button(const FString& LabelText)
 	FEmmsWidgetHandle Button = UEmmsStatics::BeginWidget(UButton::StaticClass());
 	Text(LabelText);
 	UEmmsStatics::EndWidget();
+	return Button;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::Button_Colored(const FString& LabelText, const FLinearColor& ButtonColor)
+{
+	FEmmsWidgetHandle Button = UEmmsWidgetHelpers::Button(LabelText);
+	UEmmsWidgetHelpers::SetButtonStyleColor(&Button, ButtonColor);
 	return Button;
 }
 
@@ -1428,6 +1438,102 @@ int UEmmsWidgetHelpers::GetComboBoxSelectedIndex(FEmmsWidgetHandle* Widget)
 	return ComboBox->GetSelectedIndex();
 }
 
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginScrollBox(EOrientation Orientation)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UScrollBox::StaticClass());
+	if (TEnumAsByte<EOrientation>* Value = GetPartialPendingAttribute<TEnumAsByte<EOrientation>>(Widget, Attr_UScrollBox_Orientation))
+		*Value = Orientation;
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::WithinScrollBox(EOrientation Orientation)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::WithinWidget(UScrollBox::StaticClass());
+	if (TEnumAsByte<EOrientation>* Value = GetPartialPendingAttribute<TEnumAsByte<EOrientation>>(Widget, Attr_UScrollBox_Orientation))
+		*Value = Orientation;
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginVerticalBox()
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UVerticalBox::StaticClass());
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginVerticalBox_Alignment(EHorizontalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UVerticalBox::StaticClass());
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_HAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginVerticalBox_Padding(double DefaultPadding, EHorizontalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UVerticalBox::StaticClass());
+	FMargin Padding(DefaultPadding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_Padding, &Padding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_HAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginVerticalBox_Padding2D(double DefaultHorizontalPadding, double DefaultVerticalPadding, EHorizontalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UVerticalBox::StaticClass());
+	FMargin Padding(DefaultHorizontalPadding, DefaultVerticalPadding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_Padding, &Padding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_HAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginVerticalBox_Padding4D(double DefaultLeftPadding, double DefaultTopPadding, double DefaultRightPadding, double DefaultBottomPadding, EHorizontalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UVerticalBox::StaticClass());
+	FMargin Padding(DefaultLeftPadding, DefaultTopPadding, DefaultRightPadding, DefaultBottomPadding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_Padding, &Padding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_HAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginHorizontalBox()
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UHorizontalBox::StaticClass());
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginHorizontalBox_Alignment(EVerticalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UHorizontalBox::StaticClass());
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_VAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginHorizontalBox_Padding(double DefaultPadding, EVerticalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UHorizontalBox::StaticClass());
+	FMargin Padding(DefaultPadding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_Padding, &Padding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_VAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginHorizontalBox_Padding2D(double DefaultHorizontalPadding, double DefaultVerticalPadding, EVerticalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UHorizontalBox::StaticClass());
+	FMargin Padding(DefaultHorizontalPadding, DefaultVerticalPadding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_Padding, &Padding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_VAlign, &DefaultAlignment);
+	return Widget;
+}
+
+FEmmsWidgetHandle UEmmsWidgetHelpers::BeginHorizontalBox_Padding4D(double DefaultLeftPadding, double DefaultTopPadding, double DefaultRightPadding, double DefaultBottomPadding, EVerticalAlignment DefaultAlignment)
+{
+	FEmmsWidgetHandle Widget = UEmmsStatics::BeginWidget(UHorizontalBox::StaticClass());
+	FMargin Padding(DefaultLeftPadding, DefaultTopPadding, DefaultRightPadding, DefaultBottomPadding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_Padding, &Padding);
+	UEmmsStatics::SetDefaultChildSlotAttributeValue(Widget, UEmmsSlotHelpers::Attr_VAlign, &DefaultAlignment);
+	return Widget;
+}
+
 AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsWidgetHelpers((int32)FAngelscriptBinds::EOrder::Late + 250, []
 {
 	{
@@ -1441,6 +1547,8 @@ AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsWidgetHelpers((int32)FAnge
 		SCRIPT_BIND_DOCUMENTATION("Add a TextBlock widget with the specified text and settings");
 		FAngelscriptBinds::BindGlobalFunction("mm<UButton> Button(const FString& Label)", &UEmmsWidgetHelpers::Button);
 		SCRIPT_BIND_DOCUMENTATION("Add a button with the specified label");
+		FAngelscriptBinds::BindGlobalFunction("mm<UButton> Button(const FString& Label, const FLinearColor& ButtonColor)", &UEmmsWidgetHelpers::Button_Colored);
+		SCRIPT_BIND_DOCUMENTATION("Add a colored button with the specified label");
 		FAngelscriptBinds::BindGlobalFunction("mm<UButton> Button(const FString& Label, const FSlateBrush& IconBrush, const FVector2D& IconSize = FVector2D(0, 0), const FLinearColor& IconColor = FLinearColor::White)", &UEmmsWidgetHelpers::Button_IconBrush);
 		SCRIPT_BIND_DOCUMENTATION("Add a button with the specified label and an icon image");
 		FAngelscriptBinds::BindGlobalFunction("mm<UButton> Button(const FString& Label, const FName& IconStyleBrush, const FVector2D& IconSize = FVector2D(0, 0), const FLinearColor& IconColor = FLinearColor::White)", &UEmmsWidgetHelpers::Button_IconStyleBrush);
@@ -1508,6 +1616,12 @@ AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsWidgetHelpers((int32)FAnge
 		UEmmsWidgetHelpers::Attr_UBorder_Background = UEmmsWidgetHelpers::GetWidgetAttrSpec("Background", UBorder::StaticClass());
 		// Optimized way of setting the background brush that does not require the widget to be recreated
 		UEmmsWidgetHelpers::Attr_UBorder_Background->bRequiresWidgetRebuild = false;
+		UEmmsWidgetHelpers::Attr_UBorder_Background->CompareValueFunction = [](FEmmsAttributeSpecification*, void* Container, void* PrevValue, void* NewValue)
+		{
+			FSlateBrush* PrevBrush = (FSlateBrush*)PrevValue;
+			FSlateBrush* NewBrush = (FSlateBrush*)NewValue;
+			return *PrevBrush != *NewBrush;
+		};
 		UEmmsWidgetHelpers::Attr_UBorder_Background->AssignValueFunction = [](FEmmsAttributeSpecification*, void* Container, void* Value)
 		{
 			((UBorder*)Container)->SetBrush(*(FSlateBrush*)Value);
@@ -1579,6 +1693,34 @@ AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsWidgetHelpers((int32)FAnge
 		FAngelscriptBinds::BindGlobalFunction("mm<UCheckBox> CheckBox(bool&out OutValue, const FString& Label)", &UEmmsWidgetHelpers::CheckBox_Label);
 		SCRIPT_BIND_DOCUMENTATION("Add an editable checkbox with the specified label text. The out boolean will be modified depending on whether the user checks the box");
 
+		UEmmsWidgetHelpers::Attr_UScrollBox_Orientation = UEmmsWidgetHelpers::GetWidgetAttrSpec("Orientation", UScrollBox::StaticClass());
+		FAngelscriptBinds::BindGlobalFunction("mm<UScrollBox> BeginScrollBox(EOrientation Orientation = EOrientation::Orient_Vertical)", &UEmmsWidgetHelpers::BeginScrollBox);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate ScrollBox with the given scroll orientation. All widgets will be placed inside it until mm::EndScrollBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UScrollBox> WithinScrollBox(EOrientation Orientation = EOrientation::Orient_Vertical)", &UEmmsWidgetHelpers::WithinScrollBox);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate ScrollBox with the given scroll orientation. Only the one single widget that is drawn right after the WithinScrollBox() call will be placed inside the panel");
+
+		FAngelscriptBinds::BindGlobalFunction("mm<UVerticalBox> BeginVerticalBox()", &UEmmsWidgetHelpers::BeginVerticalBox);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Vertical Box panel. All subsequent widgets will be contained within this panel until EndVerticalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UVerticalBox> BeginVerticalBox(EHorizontalAlignment DefaultAlignment)", &UEmmsWidgetHelpers::BeginVerticalBox_Alignment);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Vertical Box panel. The panel's slots will default to the specified alignment. All subsequent widgets will be contained within this panel until EndVerticalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UVerticalBox> BeginVerticalBox(float64 DefaultPadding, EHorizontalAlignment DefaultAlignment = EHorizontalAlignment::HAlign_Fill)", &UEmmsWidgetHelpers::BeginVerticalBox_Padding);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Vertical Box panel. The panel's slots will default to the specified padding and alignment. All subsequent widgets will be contained within this panel until EndVerticalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UVerticalBox> BeginVerticalBox(float64 DefaultHorizontalPadding, float64 DefaultVerticalPadding, EHorizontalAlignment DefaultAlignment = EHorizontalAlignment::HAlign_Fill)", &UEmmsWidgetHelpers::BeginVerticalBox_Padding2D);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Vertical Box panel. The panel's slots will default to the specified padding and alignment. All subsequent widgets will be contained within this panel until EndVerticalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UVerticalBox> BeginVerticalBox(float64 DefaultLeftPadding, float64 DefaultTopPadding, float64 DefaultRightPadding, float64 DefaultBottomPadding, EHorizontalAlignment DefaultAlignment = EHorizontalAlignment::HAlign_Fill)", &UEmmsWidgetHelpers::BeginVerticalBox_Padding4D);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Vertical Box panel. The panel's slots will default to the specified padding and alignment. All subsequent widgets will be contained within this panel until EndVerticalBox() is called");
+
+		FAngelscriptBinds::BindGlobalFunction("mm<UHorizontalBox> BeginHorizontalBox()", &UEmmsWidgetHelpers::BeginHorizontalBox);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Horizontal Box panel. All subsequent widgets will be contained within this panel until EndHorizontalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UHorizontalBox> BeginHorizontalBox(EVerticalAlignment DefaultAlignment)", &UEmmsWidgetHelpers::BeginHorizontalBox_Alignment);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Horizontal Box panel. The panel's slots will default to the specified alignment. All subsequent widgets will be contained within this panel until EndHorizontalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UHorizontalBox> BeginHorizontalBox(float64 DefaultPadding, EVerticalAlignment DefaultAlignment = EVerticalAlignment::VAlign_Fill)", &UEmmsWidgetHelpers::BeginHorizontalBox_Padding);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Horizontal Box panel. The panel's slots will default to the specified padding and alignment. All subsequent widgets will be contained within this panel until EndHorizontalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UHorizontalBox> BeginHorizontalBox(float64 DefaultHorizontalPadding, float64 DefaultHorizontalPadding, EVerticalAlignment DefaultAlignment = EVerticalAlignment::VAlign_Fill)", &UEmmsWidgetHelpers::BeginHorizontalBox_Padding2D);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Horizontal Box panel. The panel's slots will default to the specified padding and alignment. All subsequent widgets will be contained within this panel until EndHorizontalBox() is called");
+		FAngelscriptBinds::BindGlobalFunction("mm<UHorizontalBox> BeginHorizontalBox(float64 DefaultLeftPadding, float64 DefaultTopPadding, float64 DefaultRightPadding, float64 DefaultBottomPadding, EVerticalAlignment DefaultAlignment = EVerticalAlignment::VAlign_Fill)", &UEmmsWidgetHelpers::BeginHorizontalBox_Padding4D);
+		SCRIPT_BIND_DOCUMENTATION("Begin an immediate Horizontal Box panel. The panel's slots will default to the specified padding and alignment. All subsequent widgets will be contained within this panel until EndHorizontalBox() is called");
+
 		FAngelscriptBinds::BindGlobalFunction("void Tooltip(const FString& TooltipText)", &UEmmsStatics::SetPendingTooltipText);
 		SCRIPT_BIND_DOCUMENTATION("Set a tooltip for the next immediate widget that is added after this");
 	}
@@ -1594,8 +1736,8 @@ AS_FORCE_LINK const FAngelscriptBinds::FBind Bind_EmmsWidgetHelpers((int32)FAnge
 	}
 
 	{
-		auto mmUComboBox_ = FAngelscriptBinds::ExistingClass("mm<UComboBox>");
-		mmUComboBox_.Method("int GetSelectedIndex() const", &UEmmsWidgetHelpers::GetComboBoxSelectedIndex);
+		auto mmUComboBoxString_ = FAngelscriptBinds::ExistingClass("mm<UComboBoxString>");
+		mmUComboBoxString_.Method("int GetSelectedIndex() const", &UEmmsWidgetHelpers::GetComboBoxSelectedIndex);
 		SCRIPT_BIND_DOCUMENTATION("Get the index of the item that's currently selected in the combo box");
 	}
 

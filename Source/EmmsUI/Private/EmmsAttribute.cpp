@@ -230,17 +230,30 @@ bool FEmmsAttributeState::Update(FEmmsAttributeSpecification* Spec, void* Contai
 						Spec->ResetValue(DefaultValue);
 					}
 				}
-				else if (!Spec->AttributeProperty->Identical(
-					PrevValue.GetDataPtr(),
-					PendingValue.GetDataPtr()
-				))
+				else
 				{
-					// Set the property to the value that was specified this frame
-					if (Spec->AssignValueFunction)
-						Spec->AssignValueFunction(Spec, Container, PendingValue.GetDataPtr());
+					bool bValueIdentical = false;
+					if (Spec->CompareValueFunction)
+					{
+						bValueIdentical = Spec->CompareValueFunction(Spec, Container, PrevValue.GetDataPtr(), PendingValue.GetDataPtr());
+					}
 					else
-						Spec->AttributeProperty->SetValue_InContainer(Container, PendingValue.GetDataPtr());
-					bValueWasChanged = true;
+					{
+						bValueIdentical = Spec->AttributeProperty->Identical(
+							PrevValue.GetDataPtr(),
+							PendingValue.GetDataPtr()
+						);
+					}
+
+					if (!bValueIdentical)
+					{
+						// Set the property to the value that was specified this frame
+						if (Spec->AssignValueFunction)
+							Spec->AssignValueFunction(Spec, Container, PendingValue.GetDataPtr());
+						else
+							Spec->AttributeProperty->SetValue_InContainer(Container, PendingValue.GetDataPtr());
+						bValueWasChanged = true;
+					}
 				}
 
 				// Destruct old value that we're overriding

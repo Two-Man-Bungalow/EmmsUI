@@ -51,6 +51,7 @@ public:
 	static FEmmsAttributeSpecification* Attr_USlider_MinValue;
 	static FEmmsAttributeSpecification* Attr_USlider_MaxValue;
 	static FEmmsAttributeSpecification* Attr_UCheckBox_CheckedState;
+	static FEmmsAttributeSpecification* Attr_UScrollBox_Orientation;
 
 	static FEmmsAttributeSpecification* GetWidgetAttrSpec(FName Name, UClass* Class);
 	static FMulticastDelegateProperty* GetWidgetEvent(FName Name, UClass* Class);
@@ -77,6 +78,7 @@ public:
 	static FEmmsWidgetHandle Button(const FString& LabelText);
 	static FEmmsWidgetHandle Button_IconBrush(const FString& LabelText, const FSlateBrush& IconBrush, const FVector2D& IconSize, const FLinearColor& IconColor);
 	static FEmmsWidgetHandle Button_IconStyleBrush(const FString& LabelText, const FName& IconStyleBrush, const FVector2D& IconSize, const FLinearColor& IconColor);
+	static FEmmsWidgetHandle Button_Colored(const FString& LabelText, const FLinearColor& ButtonColor);
 	static void SetButtonStyleColor(FEmmsWidgetHandle* Handle, const FLinearColor& StyleColor);
 	static bool Button_ImplBoolConv(FEmmsWidgetHandle* Widget);
 	static void SetButtonInnerPadding(FEmmsWidgetHandle* Widget, float Horizontal, float Vertical);
@@ -160,4 +162,19 @@ public:
 	static FEmmsWidgetHandle ComboBox_Strings(const TArray<FString>& Items, FString& OutSelectedItem);
 	static FEmmsWidgetHandle ComboBox_Strings_NoOut(const TArray<FString>& Items);
 	static int GetComboBoxSelectedIndex(FEmmsWidgetHandle* Widget);
+
+	static FEmmsWidgetHandle BeginScrollBox(EOrientation Orientation);
+	static FEmmsWidgetHandle WithinScrollBox(EOrientation Orientation);
+
+	static FEmmsWidgetHandle BeginVerticalBox();
+	static FEmmsWidgetHandle BeginVerticalBox_Alignment(EHorizontalAlignment DefaultAlignment);
+	static FEmmsWidgetHandle BeginVerticalBox_Padding(double DefaultPadding, EHorizontalAlignment DefaultAlignment = EHorizontalAlignment::HAlign_Fill);
+	static FEmmsWidgetHandle BeginVerticalBox_Padding2D(double DefaultHorizontalPadding, double DefaultVerticalPadding, EHorizontalAlignment DefaultAlignment = EHorizontalAlignment::HAlign_Fill);
+	static FEmmsWidgetHandle BeginVerticalBox_Padding4D(double DefaultLeftPadding, double DefaultTopPadding, double DefaultRightPadding, double DefaultBottomPadding, EHorizontalAlignment DefaultAlignment = EHorizontalAlignment::HAlign_Fill);
+
+	static FEmmsWidgetHandle BeginHorizontalBox();
+	static FEmmsWidgetHandle BeginHorizontalBox_Alignment(EVerticalAlignment DefaultAlignment);
+	static FEmmsWidgetHandle BeginHorizontalBox_Padding(double DefaultPadding, EVerticalAlignment DefaultAlignment = EVerticalAlignment::VAlign_Fill);
+	static FEmmsWidgetHandle BeginHorizontalBox_Padding2D(double DefaultHorizontalPadding, double DefaultVerticalPadding, EVerticalAlignment DefaultAlignment = EVerticalAlignment::VAlign_Fill);
+	static FEmmsWidgetHandle BeginHorizontalBox_Padding4D(double DefaultLeftPadding, double DefaultTopPadding, double DefaultRightPadding, double DefaultBottomPadding, EVerticalAlignment DefaultAlignment = EVerticalAlignment::VAlign_Fill);
 };
