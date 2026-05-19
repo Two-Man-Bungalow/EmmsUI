@@ -22,6 +22,8 @@ public:
 	UFunction* SignatureFunction = nullptr;
 
 	void* TriggeredParameters = nullptr;
+	bool bTriggeredParametersInitialized = false;
+
 	uint64 TriggeredFrameCounter = 0;
 	uint64 TriggerCount = 0;
 

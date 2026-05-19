@@ -22,6 +22,11 @@ void UEmmsEventListener::ProcessEvent(UFunction* Function, void* Parms)
 				SignatureFunction->ParmsSize,
 				SignatureFunction->GetMinAlignment()
 			);
+		}
+
+		if (!bTriggeredParametersInitialized)
+		{
+			bTriggeredParametersInitialized = true;
 			FMemory::Memzero(TriggeredParameters, SignatureFunction->ParmsSize);
 
 			for (TFieldIterator<FProperty> It(SignatureFunction); It; ++It)
@@ -117,6 +122,18 @@ void UEmmsEventListener::UpdateEventListener(UObject* Container)
 
 	PrevDelegates.Reset();
 	PendingImmediateDelegates = MoveTemp(PrevDelegates);
+
+	// At the end of a draw, destruct any parameter data we still have, since it's old
+	// and we don't want to keep it alive in the GC
+	if (bTriggeredParametersInitialized)
+	{
+		for (TFieldIterator<FProperty> It(SignatureFunction); It; ++It)
+		{
+			if (It->HasAnyPropertyFlags(CPF_Parm))
+				It->DestroyValue_InContainer(TriggeredParameters);
+		}
+		bTriggeredParametersInitialized = false;
+	}
 }
 
 void UEmmsEventListener::AddReferencedObjects(UObject* InThis, FReferenceCollector& Collector)
@@ -124,7 +141,7 @@ void UEmmsEventListener::AddReferencedObjects(UObject* InThis, FReferenceCollect
 	Super::AddReferencedObjects(InThis, Collector);
 
 	UEmmsEventListener* Listener = (UEmmsEventListener*)InThis;
-	if (Listener->TriggeredParameters != nullptr)
+	if (Listener->TriggeredParameters != nullptr && Listener->bTriggeredParametersInitialized)
 		Collector.AddPropertyReferences(Listener->SignatureFunction, Listener->TriggeredParameters);
 }
 
@@ -132,14 +149,18 @@ void UEmmsEventListener::BeginDestroy()
 {
 	if (TriggeredParameters != nullptr)
 	{
-		for (TFieldIterator<FProperty> It(SignatureFunction); It; ++It)
+		if (bTriggeredParametersInitialized)
 		{
-			if (It->HasAnyPropertyFlags(CPF_Parm))
-				It->DestroyValue_InContainer(TriggeredParameters);
+			for (TFieldIterator<FProperty> It(SignatureFunction); It; ++It)
+			{
+				if (It->HasAnyPropertyFlags(CPF_Parm))
+					It->DestroyValue_InContainer(TriggeredParameters);
+			}
 		}
 
 		FMemory::Free(TriggeredParameters);
 		TriggeredParameters = nullptr;
+		bTriggeredParametersInitialized = false;
 	}
 
 	Super::BeginDestroy();
